@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Cartilha de Treino</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-text-size-adjust: none;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #4ca1af;
+            --accent: #fdbb2d;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.98);
+            width: 100%;
+            max-width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin: 0 auto;
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.2rem 1rem;
+            text-align: center;
+            border-bottom: 3px solid var(--accent);
+            position: relative;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding-top: env(safe-area-inset-top, 1.2rem);
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            margin-bottom: 0.4rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .day-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            background-color: var(--light);
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .nav-btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+            -webkit-appearance: none;
+            -webkit-user-select: none;
+        }
+
+        .nav-btn:active {
+            background-color: var(--primary);
+            transform: scale(0.95);
+        }
+
+        .current-day {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-align: center;
+            flex: 1;
+            padding: 0 0.5rem;
+        }
+
+        .swipe-hint {
+            text-align: center;
+            padding: 0.5rem;
+            color: #6c757d;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid #eee;
+        }
+        
+        .swipe-hint i {
+            margin: 0 0.5rem;
+            color: var(--secondary);
+        }
+
+        .content {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: env(safe-area-inset-bottom, 1rem);
+        }
+
+        .exercises {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .exercise {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s;
+        }
+
+        .exercise:active {
+            transform: scale(0.98);
+        }
+
+        .exercise h3 {
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .gif-container {
+            text-align: center;
+            margin-top: 0.8rem;
+        }
+
+        .gif-placeholder {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #6c757d;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .gif-placeholder img {
+            width: 100%;
+            height: 150px;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .week-nav {
+            display: flex;
+            overflow-x: auto;
+            padding: 0.8rem 0.5rem;
+            margin-top: 0.5rem;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .week-nav::-webkit-scrollbar {
+            display: none;
+        }
+
+        .week-nav-item {
+            flex: 0 0 auto;
+            padding: 0.6rem 1rem;
+            margin-right: 0.6rem;
+            background-color: rgba(76, 161, 175, 0.1);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            border: 1px solid var(--secondary);
+            -webkit-user-select: none;
+        }
+
+        .week-nav-item.active {
+            background-color: var(--secondary);
+            color: white;
+            font-weight: 600;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: var(--primary);
+            color: white;
+            border-top: 3px solid var(--accent);
+            font-size: 0.8rem;
+            padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(76, 161, 175, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--secondary);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* iPhone notch safe areas */
+        @supports(padding: max(0px)) {
+            header, .day-nav, footer {
+                padding-left: max(1rem, env(safe-area-inset-left));
+                padding-right: max(1rem, env(safe-area-inset-right));
+            }
+            
+            .content {
+                padding-left: max(1rem, env(safe-area-inset-left));
+                padding-right: max(1rem, env(safe-area-inset-right));
+            }
+        }
+
+        /* Rolagem infinita - elementos adicionais */
+        .additional-content {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.7));
+            border-radius: 12px;
+            border: 1px solid #eee;
+        }
+
+        .additional-content h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .tip-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .tip-card h3 {
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .tip-card p {
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        .end-message {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--primary);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💪 Cartilha de Treino</h1>
+            <p class="subtitle">Seu guia de exercícios diários</p>
+        </header>
+        
+        <div class="day-nav">
+            <button class="nav-btn" id="prev-btn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="current-day" id="current-day">Segunda - Peito & Bíceps</div>
+            <button class="nav-btn" id="next-btn">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        
+        <div class="swipe-hint">
+            <i class="fas fa-arrow-left"></i> Deslize para trocar de dia <i class="fas fa-arrow-right"></i>
+        </div>
+        
+        <div class="content">
+            <div class="exercises" id="exercises-container">
+                <!-- Exercícios serão carregados aqui via JavaScript -->
+            </div>
+            
+            <!-- Conteúdo adicional para rolagem -->
+            <div class="additional-content">
+                <h2>Dicas de Treino</h2>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <h3>Hidratação</h3>
+                        <p>Beba água antes, durante e depois do treino para manter o corpo hidratado e melhorar o desempenho.</p>
+                    </div>
+                    <div class="tip-card">
+                        <h3>Aquecimento</h3>
+                        <p>Nunca pule o aquecimento. 5-10 minutos de cardio leve preparam seus músculos para o exercício.</p>
+                    </div>
+                    <div class="tip-card">
+                        <h3>Progressão</h3>
+                        <p>Aumente gradualmente a intensidade dos exercícios para evitar lesões e obter melhores resultados.</p>
+                    </div>
+                    <div class="tip-card">
+                        <h3>Descanso</h3>
+                        <p>Respeite os dias de descanso - é durante a recuperação que os músculos se desenvolvem.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="end-message">
+                <p>Você chegou ao final! Role para cima para ver seus exercícios.</p>
+            </div>
+            
+            <div class="week-nav" id="week-nav">
+                <div class="week-nav-item active" data-day="0">Segunda</div>
+                <div class="week-nav-item" data-day="1">Terça</div>
+                <div class="week-nav-item" data-day="2">Quarta</div>
+                <div class="week-nav-item" data-day="3">Quinta</div>
+                <div class="week-nav-item" data-day="4">Sexta</div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Toque nos dias ou use as setas para navegar</p>
+        </footer>
+    </div>
+
+    <script>
+        // Dados da cartilha de treino - COM SEXTA-FEIRA ALTERADA
+        const calendario = [
+            {
+                dia: "Segunda-feira", 
+                grupo: "Peito & Bíceps", 
+                exercicios: [
+                    {nome: "Supino reto com halteres", gif: null},
+                    {nome: "Supino inclinado", gif: null},
+                    {nome: "Rosca direta", gif: null},
+                    {nome: "Rosca alternada", gif: null},
+                ]
+            },
+            {
+                dia: "Terça-feira", 
+                grupo: "Costas & Tríceps", 
+                exercicios: [
+                    {nome: "Puxada frontal", gif: null},
+                    {nome: "Remada baixa", gif: null},
+                    {nome: "Tríceps corda", gif: "https://media.tenor.com/6s2f13sVtH0AAAAC/tríceps-pulley.gif"},
+                    {nome: "Tríceps francês", gif: "https://i.pinimg.com/originals/22/5a/8a/225a8a4b1489b65d1b512e3c03a0e3f3.gif"},
+                ]
+            },
+            {
+                dia: "Quarta-feira", 
+                grupo: "Pernas", 
+                exercicios: [
+                    {nome: "Agachamento livre", gif: null},
+                    {nome: "Leg press", gif: null},
+                    {nome: "Cadeira extensora", gif: null},
+                    {nome: "Avanço (afundo)", gif: "https://i.pinimg.com/originals/7f/65/02/7f6502abf9e714e9ddc6b9c5d7b05a2a.gif"},
+                ]
+            },
+            {
+                dia: "Quinta-feira", 
+                grupo: "Ombros & Trapézio", 
+                exercicios: [
+                    {nome: "Elevação lateral", gif: null},
+                    {nome: "Desenvolvimento com halteres", gif: null},
+                    {nome: "Arnold Press", gif: "https://i.pinimg.com/originals/98/86/6c/98866ca3e2c7235f32d9b7a741a5a8c8.gif"},
+                    {nome: "Encolhimento (trapézio)", gif: "https://i.pinimg.com/originals/2a/be/50/2abe5077b4c7c36d79a5ee6bd10d15c4.gif"},
+                ]
+            },
+            {
+                dia: "Sexta-feira", 
+                grupo: "Perna, Cardio e Abdominal", 
+                exercicios: [
+                    {nome: "Agachamento sumô", gif: "https://i.pinimg.com/originals/7f/65/02/7f6502abf9e714e9ddc6b9c5d7b05a2a.gif"},
+                    {nome: "Cadeira flexora", gif: null},
+                    {nome: "Esteira (20min)", gif: "https://i.pinimg.com/originals/84/79/30/847930c8777e6b3e0e3f2b3d369e20f8.gif"},
+                    {nome: "Abdominal supra", gif: "https://i.pinimg.com/originals/7f/65/02/7f6502abf9e714e9ddc6b9c5d7b05a2a.gif"},
+                    {nome: "Prancha lateral", gif: "https://i.pinimg.com/originals/8c/9b/08/8c9b0840d74e6ba0d7b6d36ef5e1446a.gif"},
+                    {nome: "Elevação de pernas", gif: "https://i.pinimg.com/originals/7f/65/02/7f6502abf9e714e9ddc6b9c5d7b05a2a.gif"},
+                ]
+            }
+        ];
+
+        let diaAtual = 0;
+
+        // Elementos do DOM
+        const currentDayElement = document.getElementById('current-day');
+        const exercisesContainer = document.getElementById('exercises-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const weekNavItems = document.querySelectorAll('.week-nav-item');
+
+        // Função para renderizar os exercícios do dia atual
+        function renderExercises() {
+            const day = calendario[diaAtual];
+            currentDayElement.textContent = `${day.dia.split('-')[0]} - ${day.grupo}`;
+            
+            // Limpar container de exercícios
+            exercisesContainer.innerHTML = '';
+            
+            // Adicionar cada exercício
+            day.exercicios.forEach(ex => {
+                const exerciseEl = document.createElement('div');
+                exerciseEl.className = 'exercise';
+                
+                exerciseEl.innerHTML = `
+                    <h3>${ex.nome}</h3>
+                    <div class="gif-container">
+                        ${ex.gif ? 
+                            `<img src="${ex.gif}" alt="${ex.nome}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                             <div class="gif-placeholder" style="display: none;">GIF não disponível</div>` :
+                            `<div class="gif-placeholder">GIF em breve...</div>`
+                        }
+                    </div>
+                `;
+                
+                exercisesContainer.appendChild(exerciseEl);
+            });
+            
+            // Atualizar navegação da semana
+            weekNavItems.forEach((item, index) => {
+                if (index === diaAtual) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        // Navegação com botões
+        prevBtn.addEventListener('click', () => {
+            diaAtual = (diaAtual - 1 + calendario.length) % calendario.length;
+            renderExercises();
+            scrollToTop();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            diaAtual = (diaAtual + 1) % calendario.length;
+            renderExercises();
+            scrollToTop();
+        });
+
+        // Função para rolar até o topo
+        function scrollToTop() {
+            document.querySelector('.content').scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Navegação com a lista de dias
+        weekNavItems.forEach(item => {
+            item.addEventListener('click', () => {
+                diaAtual = parseInt(item.getAttribute('data-day'));
+                renderExercises();
+                scrollToTop();
+            });
+        });
+
+        // Suporte a gestos de swipe (toque) - corrigido para iOS
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        // Adicionar event listeners para elementos específicos (melhor performance)
+        document.querySelector('.content').addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        
+        document.querySelector('.content').addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+        
+        function handleSwipe() {
+            const minSwipeDistance = 50;
+            const swipeDistance = touchEndX - touchStartX;
+            
+            if (Math.abs(swipeDistance) < minSwipeDistance) return;
+            
+            if (swipeDistance > 0) {
+                // Swipe para a direita - dia anterior
+                diaAtual = (diaAtual - 1 + calendario.length) % calendario.length;
+            } else {
+                // Swipe para a esquerda - próximo dia
+                diaAtual = (diaAtual + 1) % calendario.length;
+            }
+            
+            renderExercises();
+            scrollToTop();
+        }
+
+        // Prevenir zoom em elementos interativos (iOS)
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        // Prevenir bounce/scroll no documento (iOS)
+        document.addEventListener('touchmove', function(e) {
+            if (e.scale !== 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            renderExercises();
+            
+            // Ajustar altura para evitar problemas com a barra de endereço do iOS
+            function setAppHeight() {
+                const doc = document.documentElement;
+                doc.style.setProperty('--app-height', window.innerHeight + 'px');
+                document.querySelector('.container').style.height = window.innerHeight + 'px';
+            }
+            
+            window.addEventListener('resize', setAppHeight);
+            window.addEventListener('orientationchange', setAppHeight);
+            setAppHeight();
+        });
+    </script>
+</body>
+</html>
